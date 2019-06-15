@@ -328,6 +328,30 @@ class HandlerGenerator {
 
   }
   
+  async getVenuesByOwnerId(req, res) {
+    let ownerId = req.body.ownerId;
+
+    const venueData = await models.venue.findAll({
+      where:{
+        ownerId: ownerId,
+      }
+    })
+    .catch(function(error) {
+      return res.json({
+        success: false,
+        message: 'Failed to get data! Please check the request!',
+        error: error
+      });
+    });
+
+    if(venueData){
+      return res.json({
+        data: venueData
+      });
+    }
+
+  }
+  
   async getLapanganByVenueId (req, res) {
     const lapanganData = await models.lapangan.findAll({
       where: {
