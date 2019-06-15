@@ -8,7 +8,7 @@ const bodyParser = require('body-parser');
 let jwt = require('jsonwebtoken');
 
 const Sequelize = require("sequelize");
-const connString = "postgres://postgres:admin@127.0.0.1:5432/sphera"
+const connString = "postgres://postgres:230899@127.0.0.1:5432/sphera"
 const pgp = require('pg-promise')(/* options */)
 const db = pgp(connString)
 var sequelize = new Sequelize(connString);
