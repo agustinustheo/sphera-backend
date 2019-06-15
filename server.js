@@ -329,7 +329,7 @@ class HandlerGenerator {
   }
   
   async getVenuesByOwnerId(req, res) {
-    let ownerId = req.body.ownerId;
+    let ownerId = req.decoded.ownerId;
 
     const venueData = await models.venue.findAll({
       where:{
@@ -353,6 +353,8 @@ class HandlerGenerator {
   }
   
   async getLapanganByVenueId (req, res) {
+    const venueId = req.body.venueId;
+
     const lapanganData = await models.lapangan.findAll({
       where: {
         venueId: venueId
@@ -496,6 +498,30 @@ class HandlerGenerator {
       });
   }
 
+  async getVenueById(req, res) {
+    let ownerId = req.decoded.ownerId;
+    let venueId = req.body.venueId;
+    console.log(venueId);
+    const venueData = await models.venue.findOne({
+      where: {
+        id: venueId
+      } 
+    })
+    .catch(function(error) {
+      return res.json({
+        success: false,
+        message: 'Failed to get data! Please check the request!',
+        error: error
+      });
+    });
+
+    if(venueData){
+      return res.json({
+        data: venueData
+      });
+    }
+  }
+
   async inputBooking(req, res){
     let jadwalId = req.body.jadwalId;
     let playerId = req.body.playerId;
@@ -612,7 +638,7 @@ class HandlerGenerator {
   }
   
   async getPlayerById(req, res) {
-    let playerId = req.body.playerId;
+    let playerId = req.decoded.playerId;
 
     const playerData = await models.player.findOne({
       where: {
@@ -635,7 +661,7 @@ class HandlerGenerator {
   }
   
   async getOwnerById(req, res) {
-    let ownerId = req.body.ownerId;
+    let ownerId = req.decoded.ownerId;
 
     const ownerData = await models.owner.findOne({
       where: {
@@ -905,9 +931,10 @@ function main () {
   app.get('/getOwnerById', middleware.checkToken, handlers.getOwnerById);
   app.get('/getPlayerById', middleware.checkToken, handlers.getPlayerById);
   app.get('/getFieldTypeById', middleware.checkToken, handlers.getFieldTypeById);
+  app.post('/getVenueById', middleware.checkToken, handlers.getVenueById);
   app.get('/getAllVenue', middleware.checkToken, handlers.getAllVenue);
   app.get('/getVenuesByOwnerId', middleware.checkToken, handlers.getVenuesByOwnerId);
-  app.get('/getLapanganByVenueId', middleware.checkToken, handlers.getLapanganByVenueId);
+  app.post('/getLapanganByVenueId', middleware.checkToken, handlers.getLapanganByVenueId);
   app.get('/getLapanganById', middleware.checkToken, handlers.getLapanganById);
   app.get('/getJadwalById', middleware.checkToken, handlers.getJadwalById);
   app.get('/getJadwalByLapanganId', middleware.checkToken, handlers.getJadwalByLapanganId);
