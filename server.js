@@ -43,11 +43,47 @@ class HandlerGenerator {
     let username = req.body.username;
     let password = req.body.password;
     
-    let mockedUsername = 'admin';
-    let mockedPassword = 'password';
-
-    if (username && password) {
-      if (username === mockedUsername && password === mockedPassword) {
+    models.player.findOne({ 
+      where: {
+        username: username,
+        password: password
+      } 
+    })
+    .then(function(playerData){
+      if(!playerData){
+        
+        // Check Owner
+        models.owner.findOne({ 
+          where: {
+            username: username,
+            password: password
+          } 
+        })
+        .then(function(ownerData){
+          if(!ownerData){
+            return res.json({
+              success: false,
+              message: 'Incorrect username or password',
+              error: 'Incorrect username or password'
+            });
+          }
+          else{
+            let token = jwt.sign({username: username},
+              config.secret,
+              { 
+                expiresIn: '24h' // expires in 24 hours
+              }
+            );
+            // return the JWT token for the future API calls
+            return res.json({
+              success: true,
+              message: 'Authentication successful!',
+              token: token
+            });
+          }
+        })
+      }
+      else{
         let token = jwt.sign({username: username},
           config.secret,
           { 
@@ -55,23 +91,20 @@ class HandlerGenerator {
           }
         );
         // return the JWT token for the future API calls
-        res.json({
+        return res.json({
           success: true,
           message: 'Authentication successful!',
           token: token
         });
-      } else {
-        res.send(403).json({
-          success: false,
-          message: 'Incorrect username or password'
-        });
       }
-    } else {
-      res.send(400).json({
+    })
+    .catch(function(error) {
+      return res.json({
         success: false,
-        message: 'Authentication failed! Please check the request'
+        message: 'Authentication failed! Please check the request',
+        error: error
       });
-    }
+    });
   }
 
   registerPlayer(req, res){
@@ -80,7 +113,6 @@ class HandlerGenerator {
     let password = req.body.password;
     let email = req.body.email;
     let phone = req.body.phone;
-    let address = req.body.address;
     let imageDir = req.body.imageDir;
 
     models.player
@@ -90,7 +122,6 @@ class HandlerGenerator {
         password: password, 
         email: email, 
         phone: phone, 
-        address: address, 
         imageDir: imageDir, 
       })
       .save()
@@ -110,6 +141,13 @@ class HandlerGenerator {
             token: token
           });
       })
+      .catch(function(error) {
+        return res.json({
+          success: false,
+          message: 'Registration has failed!',
+          error: error
+        });
+      });
   }
 
   registerOwner(req, res){
@@ -118,6 +156,7 @@ class HandlerGenerator {
     let password = req.body.password;
     let email = req.body.email;
     let phone = req.body.phone;
+    let address = req.body.address;
     let imageDir = req.body.imageDir;
 
     models.owner
@@ -127,6 +166,7 @@ class HandlerGenerator {
         password: password, 
         email: email, 
         phone: phone, 
+        address: address, 
         imageDir: imageDir, 
       })
       .save()
