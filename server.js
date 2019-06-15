@@ -8,11 +8,7 @@ const bodyParser = require('body-parser');
 let jwt = require('jsonwebtoken');
 
 const Sequelize = require("sequelize");
-<<<<<<< HEAD
-const connString = "postgres://postgres:230899@127.0.0.1:5432/sphera"
-=======
 const connString = "postgres://postgres:admin@127.0.0.1:5432/sphera"
->>>>>>> b3990da8476e02dc16147daae0bd85f5e602b4f9
 const pgp = require('pg-promise')(/* options */)
 const db = pgp(connString)
 var sequelize = new Sequelize(connString);
@@ -82,13 +78,9 @@ class HandlerGenerator {
             return res.json({
               success: true,
               message: 'Authentication successful!',
-<<<<<<< HEAD
-              token: token
-=======
               token: token,
               ownerId: ownerData.id,
               role: 1
->>>>>>> b3990da8476e02dc16147daae0bd85f5e602b4f9
             });
           }
         })
@@ -103,11 +95,7 @@ class HandlerGenerator {
       else{
         let token = jwt.sign({playerId: playerData.id, role: 2},
           config.secret,
-<<<<<<< HEAD
-          { 
-=======
           {
->>>>>>> b3990da8476e02dc16147daae0bd85f5e602b4f9
             expiresIn: '24h' // expires in 24 hours
           }
         );
@@ -208,13 +196,9 @@ class HandlerGenerator {
             return res.json({
               success: true,
               message: 'Registration is successful!',
-<<<<<<< HEAD
-              token: token
-=======
               token: token,
               playerId: newPlayerData.id,
               role: 2
->>>>>>> b3990da8476e02dc16147daae0bd85f5e602b4f9
             });
         })
         .catch(function(error) {
@@ -308,13 +292,9 @@ class HandlerGenerator {
           return res.json({
             success: true,
             message: 'Registration is successful!',
-<<<<<<< HEAD
-            token: token
-=======
             token: token,
             ownerId: newOwnerData.id,
             role: 1
->>>>>>> b3990da8476e02dc16147daae0bd85f5e602b4f9
           });
         })
         .catch(function(error) {
@@ -352,8 +332,6 @@ class HandlerGenerator {
 
   }
   
-<<<<<<< HEAD
-=======
   async getVenuesByOwnerId(req, res) {
     let ownerId = req.body.ownerId;
 
@@ -378,7 +356,6 @@ class HandlerGenerator {
 
   }
   
->>>>>>> b3990da8476e02dc16147daae0bd85f5e602b4f9
   async getLapanganByVenueId (req, res) {
     const lapanganData = await models.lapangan.findAll({
       where: {
@@ -523,19 +500,6 @@ class HandlerGenerator {
       });
   }
 
-<<<<<<< HEAD
-  async inputJadwal(req, res){
-    // let lapanganId = req.body.lapanganId;
-    // let date = req.body.date;
-    // let day = req.body.day;
-    // let startTime = req.body.startTime;
-    // let endTime = req.body.endTime;
-    let lapanganId = "1";
-    let day = "Monday";
-    let date = new Date();
-    let startTime = "12:00";
-    let endTime = "14:00";
-=======
   async inputBooking(req, res){
     let jadwalId = req.body.jadwalId;
     let playerId = req.body.playerId;
@@ -607,7 +571,6 @@ class HandlerGenerator {
     let day = req.body.day;
     let startTime = req.body.startTime;
     let endTime = req.body.endTime;
->>>>>>> b3990da8476e02dc16147daae0bd85f5e602b4f9
     
     const jadwalData = await models.jadwal.findOne({ 
       where: {
@@ -772,11 +735,7 @@ class HandlerGenerator {
 
     const bookingData = await models.booking.findAll({
       where: {
-<<<<<<< HEAD
-        playerId: playerId
-=======
         bookingId: bookingId
->>>>>>> b3990da8476e02dc16147daae0bd85f5e602b4f9
       } 
     })
     .catch(function(error) {
@@ -820,11 +779,7 @@ class HandlerGenerator {
   async getBookingByPlayerId(req, res) {
     let playerId = req.body.playerId;
 
-<<<<<<< HEAD
-    const bookingData = await models.booking.findOne({
-=======
     const bookingData = await models.booking.findAll({
->>>>>>> b3990da8476e02dc16147daae0bd85f5e602b4f9
       where: {
         playerId: playerId
       } 
@@ -866,8 +821,6 @@ class HandlerGenerator {
       });
     }
   }
-<<<<<<< HEAD
-=======
 
   cancelBookingById(){
     let bookingId = req.body.bookingId;
@@ -925,7 +878,6 @@ class HandlerGenerator {
       data: req.decoded
     })
   }
->>>>>>> b3990da8476e02dc16147daae0bd85f5e602b4f9
 }
 
 // Starting point of the server
@@ -947,37 +899,6 @@ function main () {
   app.post('/login', handlers.login);
   app.post('/registerOwner', handlers.registerOwner);
   app.post('/registerPlayer', handlers.registerPlayer);
-<<<<<<< HEAD
-  app.post('/inputFieldType', handlers.inputFieldType);
-  app.post('/inputVenue', handlers.inputVenue);
-  app.post('/inputLapangan', handlers.inputLapangan);
-  app.post('/inputJadwal', handlers.inputJadwal);
-  app.get('/getOwnerById', handlers.getOwnerById);
-  app.get('/getPlayerById', handlers.getPlayerById);
-  app.get('/getFieldTypeById', handlers.getFieldTypeById);
-  app.get('/getAllVenue', handlers.getAllVenue);
-  app.get('/getLapanganByVenueId', handlers.getLapanganByVenueId);
-  app.get('/getLapanganById', handlers.getLapanganById);
-  app.get('/getJadwalById', handlers.getJadwalById);
-  app.get('/getJadwalByLapanganId', handlers.getJadwalByLapanganId);
-  app.get('/getBookingById', handlers.getBookingById);
-  app.get('/getBookingByJadwalId', handlers.getBookingByJadwalId);
-  app.get('/getBookingByPlayerId', handlers.getBookingByPlayerId);
-  // app.post('/inputFieldType', middleware.checkToken, handlers.inputFieldType);
-  // app.post('/inputVenue', middleware.checkToken, handlers.inputVenue);
-  // app.post('/inputLapangan', middleware.checkToken, handlers.inputLapangan);
-  // app.post('/inputJadwal', middleware.checkToken, handlers.inputJadwal);
-  // app.get('/getOwnerById', middleware.checkToken, handlers.getOwnerById);
-  // app.get('/getPlayerById', middleware.checkToken, handlers.getPlayerById);
-  // app.get('/getFieldTypeById', middleware.checkToken, handlers.getFieldTypeById);
-  // app.get('/getAllLapangan', middleware.checkToken, handlers.getAllLapangan);
-  // app.get('/getLapanganById', middleware.checkToken, handlers.getLapanganById);
-  // app.get('/getJadwalById', middleware.checkToken, handlers.getJadwalById);
-  // app.get('/getJadwalByLapanganId', middleware.checkToken, handlers.getJadwalByLapanganId);
-  // app.get('/getBookingById', middleware.checkToken, handlers.getBookingById);
-  // app.get('/getBookingByJadwalId', middleware.checkToken, handlers.getBookingByJadwalId);
-  // app.get('/getBookingByPlayerId', middleware.checkToken, handlers.getBookingByPlayerId);
-=======
   app.get('/getUserId', middleware.checkToken, handlers.getUserId);
   app.post('/inputFieldType', middleware.checkToken, handlers.inputFieldType);
   app.post('/inputVenue', middleware.checkToken, handlers.inputVenue);
@@ -1000,7 +921,6 @@ function main () {
   app.post('/cancelBookingById', middleware.checkToken, handlers.cancelBookingById);
   app.post('/cancelBookingByPlayerId', middleware.checkToken, handlers.cancelBookingByPlayerId);
   app.post('/removeRoom', middleware.checkToken, handlers.removeRoom);
->>>>>>> b3990da8476e02dc16147daae0bd85f5e602b4f9
   app.listen(port, () => console.log(`Server is listening on port: ${port}`));
 }
 

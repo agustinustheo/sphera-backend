@@ -1,11 +1,7 @@
 {
   "development": {
     "username": "postgres",
-<<<<<<< HEAD
-    "password": "230899",
-=======
     "password": "admin",
->>>>>>> b3990da8476e02dc16147daae0bd85f5e602b4f9
     "database": "sphera",
     "host": "127.0.0.1",
     "dialect": "postgres",
