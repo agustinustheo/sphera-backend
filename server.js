@@ -8,7 +8,7 @@ const bodyParser = require('body-parser');
 let jwt = require('jsonwebtoken');
 
 const Sequelize = require("sequelize");
-const connString = "postgres://postgres:230899@127.0.0.1:5432/sphera"
+const connString = "postgres://postgres:admin@127.0.0.1:5432/sphera"
 const pgp = require('pg-promise')(/* options */)
 const db = pgp(connString)
 var sequelize = new Sequelize(connString);
@@ -78,7 +78,9 @@ class HandlerGenerator {
             return res.json({
               success: true,
               message: 'Authentication successful!',
-              token: token
+              token: token,
+              ownerId: ownerData.id,
+              role: 1
             });
           }
         })
@@ -93,7 +95,7 @@ class HandlerGenerator {
       else{
         let token = jwt.sign({playerId: playerData.id, role: 2},
           config.secret,
-          { 
+          {
             expiresIn: '24h' // expires in 24 hours
           }
         );
@@ -101,7 +103,9 @@ class HandlerGenerator {
         return res.json({
           success: true,
           message: 'Authentication successful!',
-          token: token
+          token: token,
+          playerId: playerData.id,
+          role: 2
         });
       }
     })
@@ -188,7 +192,9 @@ class HandlerGenerator {
             return res.json({
               success: true,
               message: 'Registration is successful!',
-              token: token
+              token: token,
+              playerId: newPlayerData.id,
+              role: 2
             });
         })
         .catch(function(error) {
@@ -282,7 +288,9 @@ class HandlerGenerator {
           return res.json({
             success: true,
             message: 'Registration is successful!',
-            token: token
+            token: token,
+            ownerId: newOwnerData.id,
+            role: 1
           });
         })
         .catch(function(error) {
@@ -725,6 +733,13 @@ class HandlerGenerator {
       });
     }
   }
+
+  getUserId(req, res) {
+    console.log(req.decoded)
+    return res.json({
+      data: req.decoded
+    })
+  }
 }
 
 // Starting point of the server
@@ -743,6 +758,7 @@ function main () {
   }));
   app.use(bodyParser.json());
   // Routes & Handlers
+  app.get('/getUserId', middleware.checkToken, handlers.getUserId);
   app.post('/login', handlers.login);
   app.post('/registerOwner', handlers.registerOwner);
   app.post('/registerPlayer', handlers.registerPlayer);
