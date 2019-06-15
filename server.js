@@ -82,6 +82,13 @@ class HandlerGenerator {
             });
           }
         })
+        .catch(function(error) {
+          return res.json({
+            success: false,
+            message: 'Authentication failed! Please check the request',
+            error: error
+          });
+        });
       }
       else{
         let token = jwt.sign({username: username},
@@ -107,7 +114,7 @@ class HandlerGenerator {
     });
   }
 
-  registerPlayer(req, res){
+  async registerPlayer(req, res){
     let name = req.body.name;
     let username = req.body.username;
     let password = req.body.password;
@@ -115,19 +122,128 @@ class HandlerGenerator {
     let phone = req.body.phone;
     let imageDir = req.body.imageDir;
 
-    models.player
-      .build({ 
-        name: name, 
-        username: username, 
-        password: password, 
-        email: email, 
-        phone: phone, 
-        imageDir: imageDir, 
-      })
-      .save()
-      .then(function(response) {
+    const playerData = await models.player.findOne({ 
+      where: {
+        username: username
+      } 
+    })
+    .catch(function(error) {
+      return res.json({
+        success: false,
+        message: 'Username authentication failed! Please check the request',
+        error: error
+      });
+    });
+
+    const ownerData = await models.owner.findOne({ 
+      where: {
+        username: username
+      } 
+    })
+    .catch(function(error) {
+      return res.json({
+        success: false,
+        message: 'Username authentication failed! Please check the request',
+        error: error
+      });
+    });
+
+
+
+    if(playerData == undefined && ownerData == undefined){
+      models.player
+        .build({ 
+          name: name, 
+          username: username, 
+          password: password, 
+          email: email, 
+          phone: phone, 
+          imageDir: imageDir, 
+        })
+        .save()
+        .then(function(response) {
+            let token = jwt.sign({
+                username: name
+              },
+              config.secret,
+              { 
+                expiresIn: '24h' // expires in 24 hours
+              }
+            );
+            // return the JWT token for the future API calls
+            return res.json({
+              success: true,
+              message: 'Registration is successful!',
+              token: token
+            });
+        })
+        .catch(function(error) {
+          return res.json({
+            success: false,
+            message: 'Registration has failed!',
+            error: error
+          });
+        });
+    }
+    else{
+      return res.json({
+        success: false,
+        message: 'Username is used!',
+        error: 'Username is used!'
+      });
+    }
+  }
+
+  async registerOwner(req, res){
+    let name = req.body.name;
+    let username = req.body.username;
+    let password = req.body.password;
+    let email = req.body.email;
+    let phone = req.body.phone;
+    let address = req.body.address;
+    let imageDir = req.body.imageDir;
+
+    const playerData = await models.player.findOne({ 
+      where: {
+        username: username
+      } 
+    })
+    .catch(function(error) {
+      return res.json({
+        success: false,
+        message: 'Username authentication failed! Please check the request',
+        error: error
+      });
+    });
+
+    const ownerData = await models.owner.findOne({ 
+      where: {
+        username: username
+      } 
+    })
+    .catch(function(error) {
+      return res.json({
+        success: false,
+        message: 'Username authentication failed! Please check the request',
+        error: error
+      });
+    });
+
+    if(playerData == undefined && ownerData == undefined){
+      models.owner
+        .build({ 
+          name: name, 
+          username: username, 
+          password: password, 
+          email: email, 
+          phone: phone, 
+          address: address, 
+          imageDir: imageDir, 
+        })
+        .save()
+        .then(function(data) {
           let token = jwt.sign({
-              username: name
+              username: username
             },
             config.secret,
             { 
@@ -140,66 +256,22 @@ class HandlerGenerator {
             message: 'Registration is successful!',
             token: token
           });
-      })
-      .catch(function(error) {
-        return res.json({
-          success: false,
-          message: 'Registration has failed!',
-          error: error
+        })
+        .catch(function(error) {
+          return res.json({
+            success: false,
+            message: 'Registration has failed!',
+            error: error
+          });
         });
+    }
+    else{
+      return res.json({
+        success: false,
+        message: 'Username is used!',
+        error: 'Username is used!'
       });
-  }
-
-  registerOwner(req, res){
-    let name = req.body.name;
-    let username = req.body.username;
-    let password = req.body.password;
-    let email = req.body.email;
-    let phone = req.body.phone;
-    let address = req.body.address;
-    let imageDir = req.body.imageDir;
-
-    models.owner
-      .build({ 
-        name: name, 
-        username: username, 
-        password: password, 
-        email: email, 
-        phone: phone, 
-        address: address, 
-        imageDir: imageDir, 
-      })
-      .save()
-      .then(function(data) {
-        let token = jwt.sign({
-            username: username
-          },
-          config.secret,
-          { 
-            expiresIn: '24h' // expires in 24 hours
-          }
-        );
-        // return the JWT token for the future API calls
-        return res.json({
-          success: true,
-          message: 'Registration is successful!',
-          token: token
-        });
-      })
-      .catch(function(error) {
-        return res.json({
-          success: false,
-          message: 'Registration has failed!',
-          error: error
-        });
-      });
-  }
-  
-  index (req, res) {
-    res.json({
-      success: true,
-      message: 'Index page'
-    });
+    }
   }
 }
 
@@ -216,7 +288,6 @@ function main () {
   app.post('/login', handlers.login);
   app.post('/registerOwner', handlers.registerOwner);
   app.post('/registerPlayer', handlers.registerPlayer);
-  app.get('/', middleware.checkToken, handlers.index);
   app.listen(port, () => console.log(`Server is listening on port: ${port}`));
 }
 
