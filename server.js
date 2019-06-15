@@ -273,6 +273,34 @@ class HandlerGenerator {
       });
     }
   }
+  
+  async getLapangan (req, res) {
+    const lapanganData = await models.player.all()
+    .catch(function(error) {
+      return res.json({
+        success: false,
+        message: 'Failed to get data! Please check the request!',
+        error: error
+      });
+    });
+
+  }
+  
+  async getJadwal (req, res) {
+    const jadwalData = await models.player.all({
+      where: {
+        lapanganId: lapanganId
+      } 
+    })
+    .catch(function(error) {
+      return res.json({
+        success: false,
+        message: 'Failed to get data! Please check the request!',
+        error: error
+      });
+    });
+
+  }
 }
 
 // Starting point of the server
