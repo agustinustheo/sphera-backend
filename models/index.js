@@ -35,3 +35,26 @@ db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
 module.exports = db;
+
+var User = sequelize.define('user', {
+  id: Sequelize.INTEGER,
+  name: Sequelize.STRING,
+  username: Sequelize.STRING,
+  password: Sequelize.STRING,
+  email: Sequelize.STRING,
+  phone: Sequelize.STRING,
+  image_dir: Sequelize.STRING,
+  created_at: Sequelize.DATE,
+  updated_at: Sequelize.DATE
+})
+
+var Owner = sequelize.define('owner', {
+  id: Sequelize.INTEGER,
+  name: Sequelize.STRING,
+  username: Sequelize.STRING,
+  password: Sequelize.STRING,
+  address: Sequelize.STRING,
+  image_dir: Sequelize.STRING,
+  created_at: Sequelize.DATE,
+  updated_at: Sequelize.DATE
+})

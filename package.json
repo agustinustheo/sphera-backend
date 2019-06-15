@@ -1,5 +1,5 @@
 {
-  "name": "hackathon",
+  "name": "sphera",
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/aryasurya21/Hackathon.git"
+    "url": "git+https://github.com/aryasurya21/sphera.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/aryasurya21/Hackathon/issues"
+    "url": "https://github.com/aryasurya21/sphera/issues"
   },
-  "homepage": "https://github.com/aryasurya21/Hackathon#readme",
+  "homepage": "https://github.com/aryasurya21/sphera#readme",
   "dependencies": {
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
