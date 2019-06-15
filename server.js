@@ -68,7 +68,7 @@ class HandlerGenerator {
             });
           }
           else{
-            let token = jwt.sign({username: username},
+            let token = jwt.sign({ownerId: ownerData.id, role: 1},
               config.secret,
               { 
                 expiresIn: '24h' // expires in 24 hours
@@ -91,7 +91,7 @@ class HandlerGenerator {
         });
       }
       else{
-        let token = jwt.sign({username: username},
+        let token = jwt.sign({playerId: playerData.id, role: 2},
           config.secret,
           { 
             expiresIn: '24h' // expires in 24 hours
@@ -161,9 +161,23 @@ class HandlerGenerator {
           imageDir: imageDir, 
         })
         .save()
-        .then(function(response) {
+        .then(async function(response) {
+            const newPlayerData = await models.player.findOne({ 
+              where: {
+                username: username
+              } 
+            })
+            .catch(function(error) {
+              return res.json({
+                success: false,
+                message: 'Failed to get new user data!',
+                error: error
+              });
+            });
+            
             let token = jwt.sign({
-                username: name
+                playerId: newPlayerData.id,
+                role: 2
               },
               config.secret,
               { 
@@ -241,9 +255,23 @@ class HandlerGenerator {
           imageDir: imageDir, 
         })
         .save()
-        .then(function(data) {
-          let token = jwt.sign({
+        .then(async function(data) {
+          const newOwnerData = await models.owner.findOne({ 
+            where: {
               username: username
+            } 
+          })
+          .catch(function(error) {
+            return res.json({
+              success: false,
+              message: 'Username authentication failed! Please check the request',
+              error: error
+            });
+          });
+
+          let token = jwt.sign({
+              ownerId: newOwnerData.id,
+              role: 1
             },
             config.secret,
             { 
@@ -275,7 +303,7 @@ class HandlerGenerator {
   }
   
   async getLapangan (req, res) {
-    const lapanganData = await models.player.all()
+    const lapanganData = await models.lapangan.all()
     .catch(function(error) {
       return res.json({
         success: false,
@@ -284,10 +312,18 @@ class HandlerGenerator {
       });
     });
 
+    if(lapanganData){
+      return res.json({
+        data: lapanganData
+      });
+    }
+
   }
   
   async getJadwal (req, res) {
-    const jadwalData = await models.player.all({
+    let lapanganId = req.body.lapanganId;
+
+    const jadwalData = await models.jadwal.findAll({
       where: {
         lapanganId: lapanganId
       } 
@@ -300,6 +336,184 @@ class HandlerGenerator {
       });
     });
 
+    if(jadwalData){
+      return res.json({
+        data: jadwalData
+      });
+    }
+  }
+
+  async inputFieldType(req, res){
+    let name = req.body.name;
+
+    const fieldData = await models.fieldtype.findOne({ 
+      where: {
+        name: name
+      } 
+    })
+    .catch(function(error) {
+      return res.json({
+        success: false,
+        message: 'Failed to check for identical field type names! Please check the request',
+        error: error
+      });
+    });
+
+    if(fieldData == undefined){
+      models.fieldtype
+        .build({ 
+          name: name, 
+        })
+        .save()
+        .then(function(response) {
+            return res.json({
+              success: true,
+              message: 'Successfully input field type!',
+            });
+        })
+        .catch(function(error) {
+          return res.json({
+            success: false,
+            message: 'Something went wrong when inserting field type, please check the request!',
+            error: error
+          });
+        });
+    }
+    else{
+      return res.json({
+        success: false,
+        message: 'Field type already exists!',
+        error: 'Field type already exists!'
+      });
+    }
+  }
+
+  inputLapangan(req, res){
+    let ownerId = req.body.ownerId;
+    let fieldtype = req.body.fieldtype;
+    let price = req.body.price;
+
+    models.lapangan
+      .build({ 
+        ownerId: ownerId, 
+        fieldType: fieldtype, 
+        price: price, 
+      })
+      .save()
+      .then(function(response) {
+          return res.json({
+            success: true,
+            message: 'Successfully input new lapangan!',
+          });
+      })
+      .catch(function(error) {
+        return res.json({
+          success: false,
+          message: 'Something went wrong when inserting lapangan, please check the request!',
+          error: error
+        });
+      });
+  }
+
+  async inputJadwal(req, res){
+    // let lapanganId = req.body.lapanganId;
+    // let date = req.body.date;
+    // let day = req.body.day;
+    // let startTime = req.body.startTime;
+    // let endTime = req.body.endTime;
+    let lapanganId = "5";
+    let day = "Monday";
+    let date = new Date();
+    let startTime = "10:00";
+    let endTime = "12:00";
+    
+    const jadwalData = await models.jadwal.findOne({ 
+      where: {
+        lapanganId: lapanganId, 
+        date: date, 
+        day: day, 
+        startTime: startTime, 
+        endTime: endTime, 
+      } 
+    })
+    .catch(function(error) {
+      return res.json({
+        success: false,
+        message: 'Failed to check for identical jadwals! Please check the request',
+        error: error
+      });
+    });
+
+    if(jadwalData == undefined){
+      models.jadwal
+        .build({ 
+          lapanganId: lapanganId, 
+          date: date, 
+          day: day, 
+          startTime: startTime, 
+          endTime: endTime, 
+        })
+        .save()
+        .then(function(response) {
+            return res.json({
+              success: true,
+              message: 'Successfully input new jadwal!',
+            });
+        })
+        .catch(function(error) {
+          return res.json({
+            success: false,
+            message: 'Something went wrong when inserting jadwal, please check the request!',
+            error: error
+          });
+        });
+    }
+  }
+  
+  async getPlayer(req, res) {
+    let playerId = req.body.playerId;
+
+    const playerData = await models.player.findOne({
+      where: {
+        id: playerId
+      } 
+    })
+    .catch(function(error) {
+      return res.json({
+        success: false,
+        message: 'Failed to get data! Please check the request!',
+        error: error
+      });
+    });
+
+    if(playerData){
+      return res.json({
+        data: playerData
+      });
+    }
+  }
+  
+  async getOwner(req, res) {
+    let ownerId = req.body.ownerId;
+
+    const ownerData = await models.owner.findOne({
+      where: {
+        id: ownerId
+      } 
+    })
+    .catch(function(error) {
+      return res.json({
+        success: false,
+        message: 'Failed to get data! Please check the request!',
+        error: error
+      });
+    });
+
+    if(ownerData){
+      return res.json({
+        data: ownerData
+      });
+    }
   }
 }
 
@@ -316,6 +530,20 @@ function main () {
   app.post('/login', handlers.login);
   app.post('/registerOwner', handlers.registerOwner);
   app.post('/registerPlayer', handlers.registerPlayer);
+  app.post('/inputFieldType', handlers.inputFieldType);
+  app.post('/inputLapangan', handlers.inputLapangan);
+  app.post('/inputJadwal', handlers.inputJadwal);
+  app.get('/getJadwal', handlers.getJadwal);
+  app.get('/getLapangan', handlers.getLapangan);
+  app.get('/getOwner', handlers.getOwner);
+  app.get('/getPlayer', handlers.getPlayer);
+  // app.post('/inputFieldType', middleware.checkToken, handlers.inputFieldType);
+  // app.post('/inputLapangan', middleware.checkToken, handlers.inputLapangan);
+  // app.post('/inputJadwal', middleware.checkToken, handlers.inputJadwal);
+  // app.get('/getJadwal', middleware.checkToken, handlers.getJadwal);
+  // app.get('/getLapangan', middleware.checkToken, handlers.getLapangan);
+  // app.get('/getOwner', middleware.checkToken, handlers.getOwner);
+  // app.get('/getPlayer', middleware.checkToken, handlers.getPlayer);
   app.listen(port, () => console.log(`Server is listening on port: ${port}`));
 }
 

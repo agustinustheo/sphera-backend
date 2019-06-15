@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   }, {});
   owner.associate = function(models) {
-    // associations can be defined here
+    owner.hasMany(models.lapangan, { onDelete: 'cascade' });
   };
   return owner;
 };
