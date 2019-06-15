@@ -8,7 +8,7 @@ const bodyParser = require('body-parser');
 let jwt = require('jsonwebtoken');
 
 const Sequelize = require("sequelize");
-const connString = "postgres://postgres:230899@127.0.0.1:5432/sphera"
+const connString = "postgres://postgres:admin@127.0.0.1:5432/sphera"
 const pgp = require('pg-promise')(/* options */)
 const db = pgp(connString)
 var sequelize = new Sequelize(connString);
@@ -78,7 +78,9 @@ class HandlerGenerator {
             return res.json({
               success: true,
               message: 'Authentication successful!',
-              token: token
+              token: token,
+              ownerId: ownerData.id,
+              role: 1
             });
           }
         })
@@ -93,7 +95,7 @@ class HandlerGenerator {
       else{
         let token = jwt.sign({playerId: playerData.id, role: 2},
           config.secret,
-          { 
+          {
             expiresIn: '24h' // expires in 24 hours
           }
         );
@@ -101,7 +103,9 @@ class HandlerGenerator {
         return res.json({
           success: true,
           message: 'Authentication successful!',
-          token: token
+          token: token,
+          playerId: playerData.id,
+          role: 2
         });
       }
     })
@@ -188,7 +192,9 @@ class HandlerGenerator {
             return res.json({
               success: true,
               message: 'Registration is successful!',
-              token: token
+              token: token,
+              playerId: newPlayerData.id,
+              role: 2
             });
         })
         .catch(function(error) {
@@ -282,7 +288,9 @@ class HandlerGenerator {
           return res.json({
             success: true,
             message: 'Registration is successful!',
-            token: token
+            token: token,
+            ownerId: newOwnerData.id,
+            role: 1
           });
         })
         .catch(function(error) {
@@ -786,12 +794,61 @@ class HandlerGenerator {
     }
   }
 
+  cancelBookingById(){
+    let bookingId = req.body.bookingId;
+
+    models.booking.destroy({
+      where: {
+        bookingId: bookingId,
+      }
+    })
+    .catch(function(error) {
+      return res.json({
+        success: false,
+        message: 'Failed to cancel booking! Please check the request!',
+        error: error
+      });
+    });
+  }
+
+  cancelBookingByPlayerId(){
+    let playerId = req.body.playerId;
+
+    models.booking.destroy({
+      where: {
+        playerId: playerId,
+      }
+    })
+    .catch(function(error) {
+      return res.json({
+        success: false,
+        message: 'Failed to cancel booking! Please check the request!',
+        error: error
+      });
+    });
+  }
+
   removeRoom(){
+    let playerId = req.body.playerId;
+
     models.room.destroy({
       where: {
-          // criteria
+        playerId: playerId,
       }
-  })
+    })
+    .catch(function(error) {
+      return res.json({
+        success: false,
+        message: 'Failed to leave the room! Please check the request!',
+        error: error
+      });
+    });
+  }
+
+  getUserId(req, res){
+    return res.json({
+      data: req.decoded
+    })
   }
 }
 
@@ -814,40 +871,27 @@ function main () {
   app.post('/login', handlers.login);
   app.post('/registerOwner', handlers.registerOwner);
   app.post('/registerPlayer', handlers.registerPlayer);
-  app.post('/inputFieldType', handlers.inputFieldType);
-  app.post('/inputVenue', handlers.inputVenue);
-  app.post('/inputLapangan', handlers.inputLapangan);
-  app.post('/inputJadwal', handlers.inputJadwal);
-  app.post('/inputBooking', handlers.inputBooking);
-  app.post('/joinRoom', handlers.joinRoom);
-  app.get('/getOwnerById', handlers.getOwnerById);
-  app.get('/getPlayerById', handlers.getPlayerById);
-  app.get('/getFieldTypeById', handlers.getFieldTypeById);
-  app.get('/getAllVenue', handlers.getAllVenue);
-  app.get('/getLapanganByVenueId', handlers.getLapanganByVenueId);
-  app.get('/getLapanganById', handlers.getLapanganById);
-  app.get('/getJadwalById', handlers.getJadwalById);
-  app.get('/getJadwalByLapanganId', handlers.getJadwalByLapanganId);
-  app.get('/getBookingById', handlers.getBookingById);
-  app.get('/getBookingByJadwalId', handlers.getBookingByJadwalId);
-  app.get('/getBookingByPlayerId', handlers.getBookingByPlayerId);
-  // app.post('/inputFieldType', middleware.checkToken, handlers.inputFieldType);
-  // app.post('/inputVenue', middleware.checkToken, handlers.inputVenue);
-  // app.post('/inputLapangan', middleware.checkToken, handlers.inputLapangan);
-  // app.post('/inputJadwal', middleware.checkToken, handlers.inputJadwal);
-  // app.post('/inputBooking', middleware.checkToken, handlers.inputBooking);
-  // app.post('/joinRoom', middleware.checkToken, handlers.joinRoom);
-  // app.get('/getOwnerById', middleware.checkToken, handlers.getOwnerById);
-  // app.get('/getPlayerById', middleware.checkToken, handlers.getPlayerById);
-  // app.get('/getFieldTypeById', middleware.checkToken, handlers.getFieldTypeById);
-  // app.get('/getAllVenue', middleware.checkToken, handlers.getAllVenue);
-  // app.get('/getLapanganByVenueId', middleware.checkToken, handlers.getLapanganByVenueId);
-  // app.get('/getLapanganById', middleware.checkToken, handlers.getLapanganById);
-  // app.get('/getJadwalById', middleware.checkToken, handlers.getJadwalById);
-  // app.get('/getJadwalByLapanganId', middleware.checkToken, handlers.getJadwalByLapanganId);
-  // app.get('/getBookingById', middleware.checkToken, handlers.getBookingById);
-  // app.get('/getBookingByJadwalId', middleware.checkToken, handlers.getBookingByJadwalId);
-  // app.get('/getBookingByPlayerId', middleware.checkToken, handlers.getBookingByPlayerId);
+  app.get('/getUserId', middleware.checkToken, handlers.getUserId);
+  app.post('/inputFieldType', middleware.checkToken, handlers.inputFieldType);
+  app.post('/inputVenue', middleware.checkToken, handlers.inputVenue);
+  app.post('/inputLapangan', middleware.checkToken, handlers.inputLapangan);
+  app.post('/inputJadwal', middleware.checkToken, handlers.inputJadwal);
+  app.post('/inputBooking', middleware.checkToken, handlers.inputBooking);
+  app.post('/joinRoom', middleware.checkToken, handlers.joinRoom);
+  app.get('/getOwnerById', middleware.checkToken, handlers.getOwnerById);
+  app.get('/getPlayerById', middleware.checkToken, handlers.getPlayerById);
+  app.get('/getFieldTypeById', middleware.checkToken, handlers.getFieldTypeById);
+  app.get('/getAllVenue', middleware.checkToken, handlers.getAllVenue);
+  app.get('/getLapanganByVenueId', middleware.checkToken, handlers.getLapanganByVenueId);
+  app.get('/getLapanganById', middleware.checkToken, handlers.getLapanganById);
+  app.get('/getJadwalById', middleware.checkToken, handlers.getJadwalById);
+  app.get('/getJadwalByLapanganId', middleware.checkToken, handlers.getJadwalByLapanganId);
+  app.get('/getBookingById', middleware.checkToken, handlers.getBookingById);
+  app.get('/getBookingByJadwalId', middleware.checkToken, handlers.getBookingByJadwalId);
+  app.get('/getBookingByPlayerId', middleware.checkToken, handlers.getBookingByPlayerId);
+  app.post('/cancelBookingById', middleware.checkToken, handlers.cancelBookingById);
+  app.post('/cancelBookingByPlayerId', middleware.checkToken, handlers.cancelBookingByPlayerId);
+  app.post('/removeRoom', middleware.checkToken, handlers.removeRoom);
   app.listen(port, () => console.log(`Server is listening on port: ${port}`));
 }
 
