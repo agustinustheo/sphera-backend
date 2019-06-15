@@ -19,7 +19,7 @@ module.exports = {
       price: {
         type: Sequelize.INTEGER
       },
-      fieldType: {
+      fieldtypeId: {
         type: Sequelize.INTEGER,
         references: {
           model: 'fieldtypes',
