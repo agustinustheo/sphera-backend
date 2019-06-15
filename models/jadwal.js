@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
     endTime: DataTypes.STRING,
   }, {});
   jadwal.associate = function(models) {
-    // associations can be defined here
+    jadwal.hasOne(models.booking, { onDelete: 'cascade' });
   };
   return jadwal;
 };

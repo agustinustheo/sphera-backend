@@ -6,7 +6,7 @@ module.exports = (sequelize, DataTypes) => {
     address: DataTypes.STRING
   }, {});
   venue.associate = function(models) {
-    // associations can be defined here
+    venue.hasMany(models.lapangan, { onDelete: 'cascade' });
   };
   return venue;
 };

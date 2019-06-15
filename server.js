@@ -464,17 +464,77 @@ class HandlerGenerator {
       });
   }
 
+  async inputBooking(req, res){
+    let jadwalId = req.body.jadwalId;
+    let playerId = req.body.playerId;
+
+    await models.booking
+      .build({ 
+        playerId: playerId, 
+        jadwalId: jadwalId, 
+      })
+      .save()
+      .catch(function(error) {
+        return res.json({
+          success: false,
+          message: 'Something went wrong when booking, please check the request!',
+          error: error
+        });
+      });
+
+    const bookingData = await models.booking.findOne({
+      where:{
+        jadwalId: jadwalId
+      }
+    })
+    .catch(function(error) {
+      return res.json({
+        success: false,
+        message: 'Something went wrong when authenticating booking data, please check the request!',
+        error: error
+      });
+    });
+
+    await models.room
+      .build({ 
+        playerId: playerId, 
+        bookingId: bookingData.id, 
+      })
+      .save()
+      .catch(function(error) {
+        return res.json({
+          success: false,
+          message: 'Something went wrong when creating room, please check the request!',
+          error: error
+        });
+      });
+  }
+
+  joinRoom(req, res){
+    let bookId = req.body.bookId;
+    let playerId = req.body.playerId;
+
+    models.room
+      .build({ 
+        bookId: bookId, 
+        playerId: playerId, 
+      })
+      .save()
+      .catch(function(error) {
+        return res.json({
+          success: false,
+          message: 'Something went wrong when joining room, please check the request!',
+          error: error
+        });
+      });
+  }
+
   async inputJadwal(req, res){
-    // let lapanganId = req.body.lapanganId;
-    // let date = req.body.date;
-    // let day = req.body.day;
-    // let startTime = req.body.startTime;
-    // let endTime = req.body.endTime;
-    let lapanganId = "1";
-    let day = "Monday";
-    let date = new Date();
-    let startTime = "12:00";
-    let endTime = "14:00";
+    let lapanganId = req.body.lapanganId;
+    let date = req.body.date;
+    let day = req.body.day;
+    let startTime = req.body.startTime;
+    let endTime = req.body.endTime;
     
     const jadwalData = await models.jadwal.findOne({ 
       where: {
@@ -639,7 +699,7 @@ class HandlerGenerator {
 
     const bookingData = await models.booking.findAll({
       where: {
-        playerId: playerId
+        bookingId: bookingId
       } 
     })
     .catch(function(error) {
@@ -683,7 +743,7 @@ class HandlerGenerator {
   async getBookingByPlayerId(req, res) {
     let playerId = req.body.playerId;
 
-    const bookingData = await models.booking.findOne({
+    const bookingData = await models.booking.findAll({
       where: {
         playerId: playerId
       } 
@@ -725,6 +785,14 @@ class HandlerGenerator {
       });
     }
   }
+
+  removeRoom(){
+    models.room.destroy({
+      where: {
+          // criteria
+      }
+  })
+  }
 }
 
 // Starting point of the server
@@ -750,6 +818,8 @@ function main () {
   app.post('/inputVenue', handlers.inputVenue);
   app.post('/inputLapangan', handlers.inputLapangan);
   app.post('/inputJadwal', handlers.inputJadwal);
+  app.post('/inputBooking', handlers.inputBooking);
+  app.post('/joinRoom', handlers.joinRoom);
   app.get('/getOwnerById', handlers.getOwnerById);
   app.get('/getPlayerById', handlers.getPlayerById);
   app.get('/getFieldTypeById', handlers.getFieldTypeById);
@@ -765,10 +835,13 @@ function main () {
   // app.post('/inputVenue', middleware.checkToken, handlers.inputVenue);
   // app.post('/inputLapangan', middleware.checkToken, handlers.inputLapangan);
   // app.post('/inputJadwal', middleware.checkToken, handlers.inputJadwal);
+  // app.post('/inputBooking', middleware.checkToken, handlers.inputBooking);
+  // app.post('/joinRoom', middleware.checkToken, handlers.joinRoom);
   // app.get('/getOwnerById', middleware.checkToken, handlers.getOwnerById);
   // app.get('/getPlayerById', middleware.checkToken, handlers.getPlayerById);
   // app.get('/getFieldTypeById', middleware.checkToken, handlers.getFieldTypeById);
-  // app.get('/getAllLapangan', middleware.checkToken, handlers.getAllLapangan);
+  // app.get('/getAllVenue', middleware.checkToken, handlers.getAllVenue);
+  // app.get('/getLapanganByVenueId', middleware.checkToken, handlers.getLapanganByVenueId);
   // app.get('/getLapanganById', middleware.checkToken, handlers.getLapanganById);
   // app.get('/getJadwalById', middleware.checkToken, handlers.getJadwalById);
   // app.get('/getJadwalByLapanganId', middleware.checkToken, handlers.getJadwalByLapanganId);

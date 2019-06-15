@@ -5,7 +5,7 @@ module.exports = (sequelize, DataTypes) => {
     playerId: DataTypes.INTEGER
   }, {});
   booking.associate = function(models) {
-    // associations can be defined here
+    booking.hasMany(models.room, { onDelete: 'cascade' });
   };
   return booking;
 };

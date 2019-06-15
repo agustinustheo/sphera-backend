@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   }, {});
   owner.associate = function(models) {
-    owner.hasMany(models.lapangan, { onDelete: 'cascade' });
+    owner.hasMany(models.venue, { onDelete: 'cascade' });
   };
   return owner;
 };
