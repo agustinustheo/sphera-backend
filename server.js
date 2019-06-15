@@ -8,7 +8,11 @@ const bodyParser = require('body-parser');
 let jwt = require('jsonwebtoken');
 
 const Sequelize = require("sequelize");
+<<<<<<< HEAD
 const connString = "postgres://postgres:230899@127.0.0.1:5432/sphera"
+=======
+const connString = "postgres://postgres:admin@127.0.0.1:5432/sphera"
+>>>>>>> b3990da8476e02dc16147daae0bd85f5e602b4f9
 const pgp = require('pg-promise')(/* options */)
 const db = pgp(connString)
 var sequelize = new Sequelize(connString);
@@ -78,7 +82,13 @@ class HandlerGenerator {
             return res.json({
               success: true,
               message: 'Authentication successful!',
+<<<<<<< HEAD
               token: token
+=======
+              token: token,
+              ownerId: ownerData.id,
+              role: 1
+>>>>>>> b3990da8476e02dc16147daae0bd85f5e602b4f9
             });
           }
         })
@@ -93,7 +103,11 @@ class HandlerGenerator {
       else{
         let token = jwt.sign({playerId: playerData.id, role: 2},
           config.secret,
+<<<<<<< HEAD
           { 
+=======
+          {
+>>>>>>> b3990da8476e02dc16147daae0bd85f5e602b4f9
             expiresIn: '24h' // expires in 24 hours
           }
         );
@@ -101,7 +115,13 @@ class HandlerGenerator {
         return res.json({
           success: true,
           message: 'Authentication successful!',
+<<<<<<< HEAD
           token: token
+=======
+          token: token,
+          playerId: playerData.id,
+          role: 2
+>>>>>>> b3990da8476e02dc16147daae0bd85f5e602b4f9
         });
       }
     })
@@ -188,7 +208,13 @@ class HandlerGenerator {
             return res.json({
               success: true,
               message: 'Registration is successful!',
+<<<<<<< HEAD
               token: token
+=======
+              token: token,
+              playerId: newPlayerData.id,
+              role: 2
+>>>>>>> b3990da8476e02dc16147daae0bd85f5e602b4f9
             });
         })
         .catch(function(error) {
@@ -282,7 +308,13 @@ class HandlerGenerator {
           return res.json({
             success: true,
             message: 'Registration is successful!',
+<<<<<<< HEAD
             token: token
+=======
+            token: token,
+            ownerId: newOwnerData.id,
+            role: 1
+>>>>>>> b3990da8476e02dc16147daae0bd85f5e602b4f9
           });
         })
         .catch(function(error) {
@@ -320,6 +352,33 @@ class HandlerGenerator {
 
   }
   
+<<<<<<< HEAD
+=======
+  async getVenuesByOwnerId(req, res) {
+    let ownerId = req.body.ownerId;
+
+    const venueData = await models.venue.findAll({
+      where:{
+        ownerId: ownerId,
+      }
+    })
+    .catch(function(error) {
+      return res.json({
+        success: false,
+        message: 'Failed to get data! Please check the request!',
+        error: error
+      });
+    });
+
+    if(venueData){
+      return res.json({
+        data: venueData
+      });
+    }
+
+  }
+  
+>>>>>>> b3990da8476e02dc16147daae0bd85f5e602b4f9
   async getLapanganByVenueId (req, res) {
     const lapanganData = await models.lapangan.findAll({
       where: {
@@ -464,6 +523,7 @@ class HandlerGenerator {
       });
   }
 
+<<<<<<< HEAD
   async inputJadwal(req, res){
     // let lapanganId = req.body.lapanganId;
     // let date = req.body.date;
@@ -475,6 +535,79 @@ class HandlerGenerator {
     let date = new Date();
     let startTime = "12:00";
     let endTime = "14:00";
+=======
+  async inputBooking(req, res){
+    let jadwalId = req.body.jadwalId;
+    let playerId = req.body.playerId;
+
+    await models.booking
+      .build({ 
+        playerId: playerId, 
+        jadwalId: jadwalId, 
+      })
+      .save()
+      .catch(function(error) {
+        return res.json({
+          success: false,
+          message: 'Something went wrong when booking, please check the request!',
+          error: error
+        });
+      });
+
+    const bookingData = await models.booking.findOne({
+      where:{
+        jadwalId: jadwalId
+      }
+    })
+    .catch(function(error) {
+      return res.json({
+        success: false,
+        message: 'Something went wrong when authenticating booking data, please check the request!',
+        error: error
+      });
+    });
+
+    await models.room
+      .build({ 
+        playerId: playerId, 
+        bookingId: bookingData.id, 
+      })
+      .save()
+      .catch(function(error) {
+        return res.json({
+          success: false,
+          message: 'Something went wrong when creating room, please check the request!',
+          error: error
+        });
+      });
+  }
+
+  joinRoom(req, res){
+    let bookId = req.body.bookId;
+    let playerId = req.body.playerId;
+
+    models.room
+      .build({ 
+        bookId: bookId, 
+        playerId: playerId, 
+      })
+      .save()
+      .catch(function(error) {
+        return res.json({
+          success: false,
+          message: 'Something went wrong when joining room, please check the request!',
+          error: error
+        });
+      });
+  }
+
+  async inputJadwal(req, res){
+    let lapanganId = req.body.lapanganId;
+    let date = req.body.date;
+    let day = req.body.day;
+    let startTime = req.body.startTime;
+    let endTime = req.body.endTime;
+>>>>>>> b3990da8476e02dc16147daae0bd85f5e602b4f9
     
     const jadwalData = await models.jadwal.findOne({ 
       where: {
@@ -639,7 +772,11 @@ class HandlerGenerator {
 
     const bookingData = await models.booking.findAll({
       where: {
+<<<<<<< HEAD
         playerId: playerId
+=======
+        bookingId: bookingId
+>>>>>>> b3990da8476e02dc16147daae0bd85f5e602b4f9
       } 
     })
     .catch(function(error) {
@@ -683,7 +820,11 @@ class HandlerGenerator {
   async getBookingByPlayerId(req, res) {
     let playerId = req.body.playerId;
 
+<<<<<<< HEAD
     const bookingData = await models.booking.findOne({
+=======
+    const bookingData = await models.booking.findAll({
+>>>>>>> b3990da8476e02dc16147daae0bd85f5e602b4f9
       where: {
         playerId: playerId
       } 
@@ -725,6 +866,66 @@ class HandlerGenerator {
       });
     }
   }
+<<<<<<< HEAD
+=======
+
+  cancelBookingById(){
+    let bookingId = req.body.bookingId;
+
+    models.booking.destroy({
+      where: {
+        bookingId: bookingId,
+      }
+    })
+    .catch(function(error) {
+      return res.json({
+        success: false,
+        message: 'Failed to cancel booking! Please check the request!',
+        error: error
+      });
+    });
+  }
+
+  cancelBookingByPlayerId(){
+    let playerId = req.body.playerId;
+
+    models.booking.destroy({
+      where: {
+        playerId: playerId,
+      }
+    })
+    .catch(function(error) {
+      return res.json({
+        success: false,
+        message: 'Failed to cancel booking! Please check the request!',
+        error: error
+      });
+    });
+  }
+
+  removeRoom(){
+    let playerId = req.body.playerId;
+
+    models.room.destroy({
+      where: {
+        playerId: playerId,
+      }
+    })
+    .catch(function(error) {
+      return res.json({
+        success: false,
+        message: 'Failed to leave the room! Please check the request!',
+        error: error
+      });
+    });
+  }
+
+  getUserId(req, res){
+    return res.json({
+      data: req.decoded
+    })
+  }
+>>>>>>> b3990da8476e02dc16147daae0bd85f5e602b4f9
 }
 
 // Starting point of the server
@@ -746,6 +947,7 @@ function main () {
   app.post('/login', handlers.login);
   app.post('/registerOwner', handlers.registerOwner);
   app.post('/registerPlayer', handlers.registerPlayer);
+<<<<<<< HEAD
   app.post('/inputFieldType', handlers.inputFieldType);
   app.post('/inputVenue', handlers.inputVenue);
   app.post('/inputLapangan', handlers.inputLapangan);
@@ -775,6 +977,30 @@ function main () {
   // app.get('/getBookingById', middleware.checkToken, handlers.getBookingById);
   // app.get('/getBookingByJadwalId', middleware.checkToken, handlers.getBookingByJadwalId);
   // app.get('/getBookingByPlayerId', middleware.checkToken, handlers.getBookingByPlayerId);
+=======
+  app.get('/getUserId', middleware.checkToken, handlers.getUserId);
+  app.post('/inputFieldType', middleware.checkToken, handlers.inputFieldType);
+  app.post('/inputVenue', middleware.checkToken, handlers.inputVenue);
+  app.post('/inputLapangan', middleware.checkToken, handlers.inputLapangan);
+  app.post('/inputJadwal', middleware.checkToken, handlers.inputJadwal);
+  app.post('/inputBooking', middleware.checkToken, handlers.inputBooking);
+  app.post('/joinRoom', middleware.checkToken, handlers.joinRoom);
+  app.get('/getOwnerById', middleware.checkToken, handlers.getOwnerById);
+  app.get('/getPlayerById', middleware.checkToken, handlers.getPlayerById);
+  app.get('/getFieldTypeById', middleware.checkToken, handlers.getFieldTypeById);
+  app.get('/getAllVenue', middleware.checkToken, handlers.getAllVenue);
+  app.get('/getVenuesByOwnerId', middleware.checkToken, handlers.getVenuesByOwnerId);
+  app.get('/getLapanganByVenueId', middleware.checkToken, handlers.getLapanganByVenueId);
+  app.get('/getLapanganById', middleware.checkToken, handlers.getLapanganById);
+  app.get('/getJadwalById', middleware.checkToken, handlers.getJadwalById);
+  app.get('/getJadwalByLapanganId', middleware.checkToken, handlers.getJadwalByLapanganId);
+  app.get('/getBookingById', middleware.checkToken, handlers.getBookingById);
+  app.get('/getBookingByJadwalId', middleware.checkToken, handlers.getBookingByJadwalId);
+  app.get('/getBookingByPlayerId', middleware.checkToken, handlers.getBookingByPlayerId);
+  app.post('/cancelBookingById', middleware.checkToken, handlers.cancelBookingById);
+  app.post('/cancelBookingByPlayerId', middleware.checkToken, handlers.cancelBookingByPlayerId);
+  app.post('/removeRoom', middleware.checkToken, handlers.removeRoom);
+>>>>>>> b3990da8476e02dc16147daae0bd85f5e602b4f9
   app.listen(port, () => console.log(`Server is listening on port: ${port}`));
 }
 
