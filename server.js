@@ -8,7 +8,7 @@ const bodyParser = require('body-parser');
 let jwt = require('jsonwebtoken');
 
 const Sequelize = require("sequelize");
-const connString = "postgres://postgres:230899@127.0.0.1:5432/sphera"
+const connString = "postgres://postgres:admin@127.0.0.1:5432/sphera"
 const pgp = require('pg-promise')(/* options */)
 const db = pgp(connString)
 var sequelize = new Sequelize(connString);
@@ -470,11 +470,11 @@ class HandlerGenerator {
     // let day = req.body.day;
     // let startTime = req.body.startTime;
     // let endTime = req.body.endTime;
-    let lapanganId = "5";
+    let lapanganId = "1";
     let day = "Monday";
     let date = new Date();
-    let startTime = "10:00";
-    let endTime = "12:00";
+    let startTime = "12:00";
+    let endTime = "14:00";
     
     const jadwalData = await models.jadwal.findOne({ 
       where: {
@@ -732,6 +732,12 @@ function main () {
   let app = express(); // Export app for other routes to use
   let handlers = new HandlerGenerator();
   const port = process.env.PORT || 8000;
+  app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, *");
+    next();
+  });
+  
   app.use(bodyParser.urlencoded({ // Middleware
     extended: true
   }));

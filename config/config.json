@@ -1,7 +1,7 @@
 {
   "development": {
     "username": "postgres",
-    "password": "230899",
+    "password": "admin",
     "database": "sphera",
     "host": "127.0.0.1",
     "dialect": "postgres",
