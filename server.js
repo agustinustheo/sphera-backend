@@ -906,6 +906,7 @@ function main () {
   app.get('/getPlayerById', middleware.checkToken, handlers.getPlayerById);
   app.get('/getFieldTypeById', middleware.checkToken, handlers.getFieldTypeById);
   app.get('/getAllVenue', middleware.checkToken, handlers.getAllVenue);
+  app.get('/getVenuesByOwnerId', middleware.checkToken, handlers.getVenuesByOwnerId);
   app.get('/getLapanganByVenueId', middleware.checkToken, handlers.getLapanganByVenueId);
   app.get('/getLapanganById', middleware.checkToken, handlers.getLapanganById);
   app.get('/getJadwalById', middleware.checkToken, handlers.getJadwalById);
