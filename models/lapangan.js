@@ -1,9 +1,9 @@
 'use strict';
 module.exports = (sequelize, DataTypes) => {
   const lapangan = sequelize.define('lapangan', {
-    ownerId: DataTypes.INTEGER,
+    venueId: DataTypes.INTEGER,
     price: DataTypes.INTEGER,
-    fieldType: DataTypes.INTEGER
+    fieldtypeId: DataTypes.INTEGER
   }, {});
   lapangan.associate = function(models) {
     lapangan.hasMany(models.jadwal, { onDelete: 'cascade' });

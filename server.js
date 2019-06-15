@@ -302,8 +302,30 @@ class HandlerGenerator {
     }
   }
   
-  async getLapangan (req, res) {
-    const lapanganData = await models.lapangan.all()
+  async getAllVenue (req, res) {
+    const venueData = await models.venue.findAll()
+    .catch(function(error) {
+      return res.json({
+        success: false,
+        message: 'Failed to get data! Please check the request!',
+        error: error
+      });
+    });
+
+    if(venueData){
+      return res.json({
+        data: venueData
+      });
+    }
+
+  }
+  
+  async getLapanganByVenueId (req, res) {
+    const lapanganData = await models.lapangan.findAll({
+      where: {
+        venueId: venueId
+      } 
+    })
     .catch(function(error) {
       return res.json({
         success: false,
@@ -320,7 +342,7 @@ class HandlerGenerator {
 
   }
   
-  async getJadwal (req, res) {
+  async getJadwalByLapanganId (req, res) {
     let lapanganId = req.body.lapanganId;
 
     const jadwalData = await models.jadwal.findAll({
@@ -389,13 +411,13 @@ class HandlerGenerator {
   }
 
   inputLapangan(req, res){
-    let ownerId = req.body.ownerId;
+    let venueId = req.body.venueId;
     let fieldtype = req.body.fieldtype;
     let price = req.body.price;
 
     models.lapangan
       .build({ 
-        ownerId: ownerId, 
+        venueId: venueId, 
         fieldType: fieldtype, 
         price: price, 
       })
@@ -410,6 +432,33 @@ class HandlerGenerator {
         return res.json({
           success: false,
           message: 'Something went wrong when inserting lapangan, please check the request!',
+          error: error
+        });
+      });
+  }
+
+  inputVenue(req, res){
+    let ownerId = req.body.ownerId;
+    let name = req.body.name;
+    let address = req.body.address;
+
+    models.venue
+      .build({ 
+        ownerId: ownerId, 
+        name: name, 
+        address: address, 
+      })
+      .save()
+      .then(function(response) {
+          return res.json({
+            success: true,
+            message: 'Successfully input new venue!',
+          });
+      })
+      .catch(function(error) {
+        return res.json({
+          success: false,
+          message: 'Something went wrong when inserting venue, please check the request!',
           error: error
         });
       });
@@ -470,7 +519,7 @@ class HandlerGenerator {
     }
   }
   
-  async getPlayer(req, res) {
+  async getPlayerById(req, res) {
     let playerId = req.body.playerId;
 
     const playerData = await models.player.findOne({
@@ -493,7 +542,7 @@ class HandlerGenerator {
     }
   }
   
-  async getOwner(req, res) {
+  async getOwnerById(req, res) {
     let ownerId = req.body.ownerId;
 
     const ownerData = await models.owner.findOne({
@@ -515,6 +564,167 @@ class HandlerGenerator {
       });
     }
   }
+
+  async getLapanganById(req, res) {
+    let lapanganId = req.body.lapanganId;
+
+    const lapanganData = await models.lapangan.findOne({
+      where: {
+        id: lapanganId
+      } 
+    })
+    .catch(function(error) {
+      return res.json({
+        success: false,
+        message: 'Failed to get data! Please check the request!',
+        error: error
+      });
+    });
+
+    if(lapanganData){
+      return res.json({
+        data: lapanganData
+      });
+    }
+  }
+
+  async getJadwalById(req, res) {
+    let jadwalId = req.body.jadwalId;
+
+    const jadwalData = await models.jadwal.findOne({
+      where: {
+        id: jadwalId
+      } 
+    })
+    .catch(function(error) {
+      return res.json({
+        success: false,
+        message: 'Failed to get data! Please check the request!',
+        error: error
+      });
+    });
+
+    if(jadwalData){
+      return res.json({
+        data: jadwalData
+      });
+    }
+  }
+
+  async getFieldTypeById(req, res) {
+    let fieldtypeId = req.body.fieldtypeId;
+
+    const fieldtypeData = await models.fieldtype.findOne({
+      where: {
+        id: fieldtypeId
+      } 
+    })
+    .catch(function(error) {
+      return res.json({
+        success: false,
+        message: 'Failed to get data! Please check the request!',
+        error: error
+      });
+    });
+
+    if(fieldtypeData){
+      return res.json({
+        data: fieldtypeData
+      });
+    }
+  }
+
+  async getBookingById(req, res) {
+    let bookingId = req.body.bookingId;
+
+    const bookingData = await models.booking.findAll({
+      where: {
+        playerId: playerId
+      } 
+    })
+    .catch(function(error) {
+      return res.json({
+        success: false,
+        message: 'Failed to get data! Please check the request!',
+        error: error
+      });
+    });
+
+    if(bookingData){
+      return res.json({
+        data: bookingData
+      });
+    }
+  }
+
+  async getBookingByJadwalId(req, res) {
+    let jadwalId = req.body.jadwalId;
+
+    const bookingData = await models.booking.findOne({
+      where: {
+        jadwalId: jadwalId
+      } 
+    })
+    .catch(function(error) {
+      return res.json({
+        success: false,
+        message: 'Failed to get data! Please check the request!',
+        error: error
+      });
+    });
+
+    if(bookingData){
+      return res.json({
+        data: bookingData
+      });
+    }
+  }
+
+  async getBookingByPlayerId(req, res) {
+    let playerId = req.body.playerId;
+
+    const bookingData = await models.booking.findOne({
+      where: {
+        playerId: playerId
+      } 
+    })
+    .catch(function(error) {
+      return res.json({
+        success: false,
+        message: 'Failed to get data! Please check the request!',
+        error: error
+      });
+    });
+
+    if(bookingData){
+      return res.json({
+        data: bookingData
+      });
+    }
+  }
+
+  async getBookingById(req, res) {
+    let bookingId = req.body.bookingId;
+
+    const bookingData = await models.booking.findOne({
+      where: {
+        id: bookingId
+      } 
+    })
+    .catch(function(error) {
+      return res.json({
+        success: false,
+        message: 'Failed to get data! Please check the request!',
+        error: error
+      });
+    });
+
+    if(bookingData){
+      return res.json({
+        data: bookingData
+      });
+    }
+  }
 }
 
 // Starting point of the server
@@ -531,19 +741,34 @@ function main () {
   app.post('/registerOwner', handlers.registerOwner);
   app.post('/registerPlayer', handlers.registerPlayer);
   app.post('/inputFieldType', handlers.inputFieldType);
+  app.post('/inputVenue', handlers.inputVenue);
   app.post('/inputLapangan', handlers.inputLapangan);
   app.post('/inputJadwal', handlers.inputJadwal);
-  app.get('/getJadwal', handlers.getJadwal);
-  app.get('/getLapangan', handlers.getLapangan);
-  app.get('/getOwner', handlers.getOwner);
-  app.get('/getPlayer', handlers.getPlayer);
+  app.get('/getOwnerById', handlers.getOwnerById);
+  app.get('/getPlayerById', handlers.getPlayerById);
+  app.get('/getFieldTypeById', handlers.getFieldTypeById);
+  app.get('/getAllVenue', handlers.getAllVenue);
+  app.get('/getLapanganByVenueId', handlers.getLapanganByVenueId);
+  app.get('/getLapanganById', handlers.getLapanganById);
+  app.get('/getJadwalById', handlers.getJadwalById);
+  app.get('/getJadwalByLapanganId', handlers.getJadwalByLapanganId);
+  app.get('/getBookingById', handlers.getBookingById);
+  app.get('/getBookingByJadwalId', handlers.getBookingByJadwalId);
+  app.get('/getBookingByPlayerId', handlers.getBookingByPlayerId);
   // app.post('/inputFieldType', middleware.checkToken, handlers.inputFieldType);
+  // app.post('/inputVenue', middleware.checkToken, handlers.inputVenue);
   // app.post('/inputLapangan', middleware.checkToken, handlers.inputLapangan);
   // app.post('/inputJadwal', middleware.checkToken, handlers.inputJadwal);
-  // app.get('/getJadwal', middleware.checkToken, handlers.getJadwal);
-  // app.get('/getLapangan', middleware.checkToken, handlers.getLapangan);
-  // app.get('/getOwner', middleware.checkToken, handlers.getOwner);
-  // app.get('/getPlayer', middleware.checkToken, handlers.getPlayer);
+  // app.get('/getOwnerById', middleware.checkToken, handlers.getOwnerById);
+  // app.get('/getPlayerById', middleware.checkToken, handlers.getPlayerById);
+  // app.get('/getFieldTypeById', middleware.checkToken, handlers.getFieldTypeById);
+  // app.get('/getAllLapangan', middleware.checkToken, handlers.getAllLapangan);
+  // app.get('/getLapanganById', middleware.checkToken, handlers.getLapanganById);
+  // app.get('/getJadwalById', middleware.checkToken, handlers.getJadwalById);
+  // app.get('/getJadwalByLapanganId', middleware.checkToken, handlers.getJadwalByLapanganId);
+  // app.get('/getBookingById', middleware.checkToken, handlers.getBookingById);
+  // app.get('/getBookingByJadwalId', middleware.checkToken, handlers.getBookingByJadwalId);
+  // app.get('/getBookingByPlayerId', middleware.checkToken, handlers.getBookingByPlayerId);
   app.listen(port, () => console.log(`Server is listening on port: ${port}`));
 }
 
