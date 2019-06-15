@@ -3,7 +3,7 @@
 module.exports = {
   up: (queryInterface, Sequelize) => {
     return queryInterface.createTable(
-      'user',
+      'players',
       {
         id: {
           type: Sequelize.INTEGER,
@@ -15,11 +15,11 @@ module.exports = {
         password: Sequelize.STRING,
         email: Sequelize.STRING,
         phone: Sequelize.STRING,
-        image_dir: Sequelize.STRING,
-        created_at: {
+        imageDir: Sequelize.STRING,
+        createdAt: {
           type: Sequelize.DATE
         },
-        updated_at: {
+        updatedAt: {
           type: Sequelize.DATE
         }
       }
